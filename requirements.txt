@@ -1,0 +1,8 @@
+beautifulsoup4==4.8.1
+Django==2.2.7
+djangorestframework==3.10.3
+lxml==4.4.1
+mosspy==1.0.8
+pytz==2019.3
+soupsieve==1.9.5
+sqlparse==0.3.0

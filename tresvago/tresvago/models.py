@@ -13,9 +13,13 @@ class Usuario(models.Model):
         verbose_name_plural = "Usuário"
         verbose_name = "Usuário"
 
+    def __str__(self):
+        return self.usuario + " " + str(self.tipo)
 
 class SiteReserva(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    url = models.CharField(max_length=255, blank=False, unique=True)
+    senha = models.CharField(max_length=255, blank=False, unique=False)
     nome = models.CharField(max_length=255, blank=False, unique=True)
     telefone = models.CharField(max_length=20, blank=False, unique=True)
 
@@ -27,9 +31,26 @@ class SiteReserva(models.Model):
     def __str__(self):
         return self.nome
 
+    def save(self, *args, **kwargs):
+        first = False
+        if self.pk is None:
+            first = True
+        if first:
+            user = User.objects.create_user(
+                username=self.url,
+                email=self.url + '@site.com',
+                password=self.senha)
+            usuario = Usuario(usuario=user, tipo=0)
+            usuario.save()
+            self.usuario = usuario
+            Token.objects.create(user=user)
+        super().save(*args, **kwargs)
+
 
 class Hotel(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    cnpj = models.CharField(max_length=255, blank=False, unique=True)
+    senha = models.CharField(max_length=255, blank=False, unique=False)
     nome = models.CharField(max_length=30, blank=False, unique=True)
     cidade = models.CharField(max_length=30, blank=False)
 
@@ -40,9 +61,16 @@ class Hotel(models.Model):
         first = False
         if self.pk is None:
             first = True
-        super().save(*args, **kwargs)
         if first:
-            Token.objects.create(user=self.usuario)
+            user = User.objects.create_user(
+                username=self.cnpj,
+                email=self.cnpj + '@hotel.com',
+                password=self.senha)
+            usuario = Usuario(usuario=user, tipo=0)
+            usuario.save()
+            self.usuario = usuario
+            Token.objects.create(user=user)
+        super().save(*args, **kwargs)
 
 
 class Promocao(models.Model):
