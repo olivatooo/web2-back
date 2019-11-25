@@ -21,5 +21,5 @@ urlpatterns = [
     # você quer mexer aqui
     #path('auth', auth.obtain_auth_token),
     path('auth', views.CustomAuthToken.as_view()),
-    path('test-auth/', views.test_auth.as_view()),
+    path('test-auth/', views.TestAuth.as_view()),
 ]
