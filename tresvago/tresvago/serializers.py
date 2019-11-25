@@ -31,8 +31,6 @@ class SiteReservaSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class PromocaoSerializer(serializers.ModelSerializer):
-    site = serializers.PrimaryKeyRelatedField(queryset=SiteReserva.objects.all())
-    hotel = serializers.PrimaryKeyRelatedField(queryset=Hotel.objects.all())
 
     class Meta:
         model = Promocao

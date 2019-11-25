@@ -1,11 +1,11 @@
 from django.contrib.auth import authenticate
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils.dateparse import parse_datetime
-
+from django.db.models import Q
 
 from .models import *
 from .serializers import HotelSerializer, SiteReservaSerializer, PromocaoSerializer, UserSerializer
@@ -40,6 +40,22 @@ class PromocaoViewSet(viewsets.ModelViewSet):
     queryset = Promocao.objects.all()
     serializer_class = PromocaoSerializer
 
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        try:
+            hotel = Hotel.objects.get(id=data['hotel'])
+            site = SiteReserva.objects.get(id=data['site'])
+            Promocao.objects.create(
+                site=site,
+                hotel=hotel,
+                preco=data['preco'],
+                data_inicio=parse_datetime(data['data_inicio']),
+                data_fim=parse_datetime(data['data_fim']),
+            )
+            return Response({"msg": "Promoção criada com sucesso"}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({'msg': str(e)}, status=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS)
+
 
 class PromocaoFilter(APIView):
     def get(self, request):
@@ -51,13 +67,14 @@ class PromocaoFilter(APIView):
             promocoes = promocoes.filter(hotel=data['hotel'])
         if 'cidade' in data:
             promocoes = promocoes.filter(hotel__cidade=data['cidade'])
-        if 'data_inicio' in data:
+        if 'data_inicio' in data and 'data_fim' in data:
             inicio = parse_datetime(data['data_inicio'])
-            promocoes = promocoes.filter(data_inicio__gte=inicio)
-        if 'data_fim' in data:
             fim = parse_datetime(data['data_fim'])
-            promocoes = promocoes.filter(data_fim__lte=fim)
-
+            promocoes = promocoes.filter(
+                Q(data_inicio__lte=inicio, data_fim__gte=inicio) |
+                Q(data_inicio__lte=fim, data_fim__gte=fim) |
+                Q(data_inicio__gte=inicio, data_fim__lte=fim)
+            )
         return Response(PromocaoSerializer(promocoes, many=True).data)
 
 
