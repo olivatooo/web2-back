@@ -54,7 +54,7 @@ class PromocaoViewSet(viewsets.ModelViewSet):
             )
             return Response({"msg": "Promoção criada com sucesso"}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response({'msg': str(e)}, status=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS)
+            return Response({'msg': "Data de promoção coincide com promoções anteriores"}, status=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS)
 
 
 class PromocaoFilter(APIView):
