@@ -10,7 +10,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework import generics
 from rest_framework.authtoken.views import ObtainAuthToken
 from django.contrib.auth import authenticate
-
+from rest_framework.views import APIView
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -44,10 +44,10 @@ class CustomAuthToken(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
-        data = request.data.dict()
+        data = request.data
         user = authenticate(username=data['username'], password=data['password'])
         usuario = Usuario.objects.get(usuario=user)
-        if usuario.tipo == 0:
+        if usuario.tipo == 1:
             site = SiteReserva.objects.get(usuario=usuario)
             return Response({
                 'id': user.id,
@@ -57,7 +57,7 @@ class CustomAuthToken(ObtainAuthToken):
                 'url': site.url,
                 'token': token.key,
             })
-        if usuario.tipo == 1:
+        if usuario.tipo == 2:
             hotel = Hotel.objects.get(usuario=usuario)
             return Response({
                 'id': user.id,
@@ -70,15 +70,31 @@ class CustomAuthToken(ObtainAuthToken):
 
 
 
-@api_view(['GET'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
-def test_view(request, format=None):
-    try:
-        content = {
-            'usuario': str(request.user),  # `django.contrib.auth.User` instance.
-            'auth': str(request.auth),  # None
-        }
-        return Response(content)
-    except:
-        return Response({"error": "user don't have a token"})
+class test_auth(APIView):
+    permission_classes = (IsAuthenticated,)             # <-- And here
+
+    def get(self, request):
+        user = request.user
+        usuario = Usuario.objects.get(usuario=user)
+
+        if usuario.tipo == 1:
+            site = SiteReserva.objects.get(usuario=usuario)
+            return Response({
+                'id': user.id,
+                'tipo': usuario.tipo,
+                'nome': site.nome,
+                'telefone': site.telefone,
+                'url': site.url,
+                'token': token.key,
+            })
+        if usuario.tipo == 2:
+            hotel = Hotel.objects.get(usuario=usuario)
+            return Response({
+                'id': user.id,
+                'tipo': usuario.tipo,
+                'nome': hotel.nome,
+                'cnpj': hotel.cnpj,
+                'cidade': hotel.cidade,
+                'token': token.key,
+            })
+        return Response({"nome": "admin", "tipo" : 0})

@@ -30,7 +30,11 @@ class SiteReservaSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'nome', 'telefone', 'url', 'senha']
 
 
-class PromocaoSerializer(serializers.HyperlinkedModelSerializer):
+class PromocaoSerializer(serializers.ModelSerializer):
+
+    site = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
+    hotel = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
+
     class Meta:
         model = Promocao
         fields = ['site', 'hotel', 'preco', 'data_inicio', 'data_fim']
