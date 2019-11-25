@@ -19,6 +19,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
     # você quer mexer aqui
-    path('auth', auth.obtain_auth_token),
+    #path('auth', auth.obtain_auth_token),
+    path('auth', views.CustomAuthToken.as_view()),
     path('test-auth/', views.test_view),
 ]

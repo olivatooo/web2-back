@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework import generics
+from rest_framework.authtoken.views import ObtainAuthToken
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -18,13 +19,13 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class HotelViewSet(viewsets.ModelViewSet):
     pagination_class = None
-    queryset = Hotel.objects.all().defer('senha')
+    queryset = Hotel.objects.defer('senha')
     serializer_class = HotelSerializer
 
 
 class SiteReservaViewSet(viewsets.ModelViewSet):
     pagination_class = None
-    queryset = SiteReserva.objects.all().defer('senha')
+    queryset = SiteReserva.objects.defer('senha')
     serializer_class = SiteReservaSerializer
 
 
@@ -34,13 +35,45 @@ class PromocaoViewSet(viewsets.ModelViewSet):
     serializer_class = PromocaoSerializer
 
 
+class CustomAuthToken(ObtainAuthToken):
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+
+        usuario = Usuario.objects.get(usuario=user)
+        if usuario.tipo == 0:
+            site = SiteReserva.objects.get(usuario=usuario)
+            return Response({
+                'id': user.id,
+                'tipo': usuario.tipo,
+                'nome': site.nome,
+                'telefone': site.telefone,
+                'url': site.url,
+                'token': token.key,
+            })
+        if usuario.tipo == 1:
+            hotel = Hotel.objects.get(usuario=usuario)
+            return Response({
+                'id': user.id,
+                'tipo': usuario.tipo,
+                'nome': hotel.nome,
+                'cnpj': hotel.cnpj,
+                'cidade': hotel.cidade,
+                'token': token.key,
+            })
+
+
+
 @api_view(['GET'])
-@authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
+#@authentication_classes([SessionAuthentication, BasicAuthentication])
+#@permission_classes([IsAuthenticated])
 def test_view(request, format=None):
     try:
         content = {
-            'user': str(request.user),  # `django.contrib.auth.User` instance.
+            'usuario': str(request.user),  # `django.contrib.auth.User` instance.
             'auth': str(request.auth),  # None
         }
         return Response(content)

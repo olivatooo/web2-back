@@ -4,9 +4,11 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.exceptions import APIException
 
 class Usuario(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, unique=True)
     tipo = models.IntegerField(blank=False, unique=False, null=True)
 
     class Meta:
@@ -40,7 +42,7 @@ class SiteReserva(models.Model):
                 username=self.url,
                 email=self.url + '@site.com',
                 password=self.senha)
-            usuario = Usuario(usuario=user, tipo=0)
+            usuario = Usuario(usuario=user, tipo=1)
             usuario.save()
             self.usuario = usuario
             Token.objects.create(user=user)
@@ -66,7 +68,7 @@ class Hotel(models.Model):
                 username=self.cnpj,
                 email=self.cnpj + '@hotel.com',
                 password=self.senha)
-            usuario = Usuario(usuario=user, tipo=0)
+            usuario = Usuario(usuario=user, tipo=2)
             usuario.save()
             self.usuario = usuario
             Token.objects.create(user=user)
@@ -76,7 +78,7 @@ class Hotel(models.Model):
 class Promocao(models.Model):
     site = models.ForeignKey(SiteReserva, on_delete=models.CASCADE)
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
-    preco = models.DecimalField(max_digits=5, decimal_places=2)
+    preco = models.IntegerField()
     data_inicio = models.DateTimeField()
     data_fim = models.DateTimeField()
 
@@ -86,3 +88,13 @@ class Promocao(models.Model):
     class Meta:
         verbose_name_plural = "Promoção"
         verbose_name = "Promoções"
+
+    def save(self, *args, **kwargs):
+        promocoes = Promocao.objects.filter(hotel=self.hotel)
+        if self.data_fim <= self.data_inicio:
+            raise APIException({"msg": "Data da promoção inválida"})
+        for p in promocoes:
+            # (t1start <= t2start <= t1end) or (t2start <= t1start <= t2end)
+            if (self.data_inicio <= p.data_inicio <= self.data_fim) or (p.data_inicio <= self.data_inicio <= p.data_fim):
+                raise APIException({"msg": "Data da promoção coincíde com promoções anteriores"})
+        super().save(*args, **kwargs)
