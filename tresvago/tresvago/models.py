@@ -16,7 +16,7 @@ class Usuario(models.Model):
         verbose_name = "Usuário"
 
     def __str__(self):
-        return self.usuario + " " + str(self.tipo)
+        return str(self.usuario) + " " + str(self.tipo)
 
 class SiteReserva(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)

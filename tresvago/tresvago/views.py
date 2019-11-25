@@ -76,6 +76,7 @@ class test_auth(APIView):
     def get(self, request):
         user = request.user
         usuario = Usuario.objects.get(usuario=user)
+        token, created = Token.objects.get_or_create(user=user)
 
         if usuario.tipo == 1:
             site = SiteReserva.objects.get(usuario=usuario)
