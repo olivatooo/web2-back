@@ -21,13 +21,13 @@ class UsuarioSerializer(serializers.HyperlinkedModelSerializer):
 class HotelSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Hotel
-        fields = ['nome', 'cidade', 'cnpj', 'senha']
+        fields = ['id', 'nome', 'cidade', 'cnpj', 'senha']
 
 
 class SiteReservaSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = SiteReserva
-        fields = ['nome', 'telefone', 'url', 'senha']
+        fields = ['id', 'nome', 'telefone', 'url', 'senha']
 
 
 class PromocaoSerializer(serializers.HyperlinkedModelSerializer):
