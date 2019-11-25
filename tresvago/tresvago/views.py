@@ -1,17 +1,18 @@
-from django.shortcuts import render
-from rest_framework import viewsets
-from .serializers import HotelSerializer, SiteReservaSerializer, PromocaoSerializer, UserSerializer
-from .models import *
-from django.contrib.auth.models import User, Group
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from django.contrib.auth import authenticate
+from rest_framework import viewsets, status
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework import generics
-from rest_framework.authtoken.views import ObtainAuthToken
-from django.contrib.auth import authenticate
 from rest_framework.views import APIView
-from rest_framework.renderers import JSONRenderer
+
+from .models import *
+from .serializers import HotelSerializer, SiteReservaSerializer, PromocaoSerializer, UserSerializer
+
+
+def has_permission(permission, user):
+    if user.tipo == permission:
+        return True
+    return False
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -24,6 +25,16 @@ class HotelViewSet(viewsets.ModelViewSet):
     pagination_class = None
     queryset = Hotel.objects.defer('senha')
     serializer_class = HotelSerializer
+
+    def list(self, request, **kwargs):
+        try:
+            fields = Hotel._meta.fields
+            fields.remove('senha')
+            queryset = Hotel.objects.defer('senha').values(*fields)
+            serializer = HotelSerializer(queryset, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
 
 class SiteReservaViewSet(viewsets.ModelViewSet):
@@ -86,11 +97,11 @@ class CustomAuthToken(ObtainAuthToken):
                 'token': token.key,
             })
 
-        return Response({"nome": str(user) , "tipo":0, 'token': token.key})
+        return Response({"nome": str(user), "tipo": 0, 'token': token.key})
 
 
 class TestAuth(APIView):
-    permission_classes = (IsAuthenticated,)             # <-- And here
+    permission_classes = (IsAuthenticated,)  # <-- And here
 
     def get(self, request):
         user = request.user
@@ -117,4 +128,4 @@ class TestAuth(APIView):
                 'cidade': hotel.cidade,
                 'token': token.key,
             })
-        return Response({"nome": "admin", "tipo" : 0, "token" : token.key})
+        return Response({"nome": "admin", "tipo": 0, "token": token.key})

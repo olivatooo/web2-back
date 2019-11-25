@@ -1,11 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
-from django.conf import settings
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
-from rest_framework.response import Response
 from rest_framework.exceptions import APIException
+
 
 class Usuario(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -18,13 +15,13 @@ class Usuario(models.Model):
     def __str__(self):
         return str(self.usuario) + " " + str(self.tipo)
 
+
 class SiteReserva(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     url = models.CharField(max_length=255, blank=False, unique=True)
     senha = models.CharField(max_length=255, blank=False, unique=False)
     nome = models.CharField(max_length=255, blank=False, unique=True)
     telefone = models.CharField(max_length=20, blank=False, unique=True)
-
 
     class Meta:
         verbose_name_plural = "Sites de Reserva"
@@ -94,6 +91,7 @@ class Promocao(models.Model):
         if self.data_fim <= self.data_inicio:
             raise APIException({"msg": "Data da promoção inválida"})
         for p in promocoes:
-            if (self.data_inicio <= p.data_inicio <= self.data_fim) or (p.data_inicio <= self.data_inicio <= p.data_fim):
+            if (self.data_inicio <= p.data_inicio <= self.data_fim) or (
+                    p.data_inicio <= self.data_inicio <= p.data_fim):
                 raise APIException({"msg": "Data da promoção coincíde com promoções anteriores"})
         super().save(*args, **kwargs)

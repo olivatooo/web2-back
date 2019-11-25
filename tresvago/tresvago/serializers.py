@@ -15,7 +15,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class UsuarioSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Usuario
-        fields = ['usuario' ,'tipo']
+        fields = ['usuario', 'tipo']
 
 
 class HotelSerializer(serializers.HyperlinkedModelSerializer):
@@ -31,7 +31,6 @@ class SiteReservaSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class PromocaoSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Promocao
         fields = ['site', 'hotel', 'preco', 'data_inicio', 'data_fim']
