@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate
-from rest_framework import viewsets, status
+from rest_framework import viewsets
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -43,12 +43,13 @@ class PromocaoFilter(APIView):
     def get(self, request):
         promocoes = Promocao.objects.all()
         data = request.data
+        print("data", data)
         if 'site' in data:
             promocoes = promocoes.filter(site=data['site'])
         if 'hotel' in data:
             promocoes = promocoes.filter(hotel=data['hotel'])
         if 'cidade' in data:
-            promocoes = promocoes.filter(cidade=data['cidade'])
+            promocoes = promocoes.filter(hotel__cidade=data['cidade'])
         if 'data_inicio' in data and 'data_fim' in data:
             promocoes = promocoes.filter(data_inicio__gte=data['data_inicio'])
             promocoes = promocoes.filter(data_fim__lte=data['data_fim'])
@@ -91,7 +92,7 @@ class CustomAuthToken(ObtainAuthToken):
 
 
 class TestAuth(APIView):
-    permission_classes = (IsAuthenticated,)  # <-- And here
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         user = request.user
