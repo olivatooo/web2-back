@@ -67,7 +67,7 @@ class CustomAuthToken(ObtainAuthToken):
                 'cidade': hotel.cidade,
                 'token': token.key,
             })
-
+        return Response({"nome": str(user) , "tipo":0})
 
 
 class test_auth(APIView):
