@@ -94,7 +94,6 @@ class Promocao(models.Model):
         if self.data_fim <= self.data_inicio:
             raise APIException({"msg": "Data da promoção inválida"})
         for p in promocoes:
-            # (t1start <= t2start <= t1end) or (t2start <= t1start <= t2end)
             if (self.data_inicio <= p.data_inicio <= self.data_fim) or (p.data_inicio <= self.data_inicio <= p.data_fim):
                 raise APIException({"msg": "Data da promoção coincíde com promoções anteriores"})
         super().save(*args, **kwargs)

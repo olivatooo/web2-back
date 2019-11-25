@@ -11,6 +11,7 @@ from rest_framework import generics
 from rest_framework.authtoken.views import ObtainAuthToken
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView
+from rest_framework.renderers import JSONRenderer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -39,7 +40,20 @@ class PromocaoViewSet(viewsets.ModelViewSet):
 
 class PromocaoFilter(APIView):
     def get(self, request):
-        pass
+        promocoes = Promocao.objects.all()
+        data = request.data
+        if 'site' in data:
+            promocoes = promocoes.filter(site=data['site'])
+        if 'hotel' in data:
+            promocoes = promocoes.filter(hotel=data['hotel'])
+        if 'cidade' in data:
+            promocoes = promocoes.filter(cidade=data['cidade'])
+        if 'data_inicio' in data and 'data_fim' in data:
+            promocoes = promocoes.filter(data_inicio__gte=data['data_inicio'])
+            promocoes = promocoes.filter(data_fim__lte=data['data_fim'])
+
+        return Response(PromocaoSerializer(promocoes, many=True).data)
+
 
 class CustomAuthToken(ObtainAuthToken):
 
