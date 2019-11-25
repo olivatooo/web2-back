@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import APIException
 
 class Usuario(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE, unique=True)
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     tipo = models.IntegerField(blank=False, unique=False, null=True)
 
     class Meta:

@@ -9,6 +9,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework import generics
 from rest_framework.authtoken.views import ObtainAuthToken
+from django.contrib.auth import authenticate
+
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -42,7 +44,8 @@ class CustomAuthToken(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
-
+        data = request.data.dict()
+        user = authenticate(username=data['username'], password=data['password'])
         usuario = Usuario.objects.get(usuario=user)
         if usuario.tipo == 0:
             site = SiteReserva.objects.get(usuario=usuario)
@@ -68,8 +71,8 @@ class CustomAuthToken(ObtainAuthToken):
 
 
 @api_view(['GET'])
-#@authentication_classes([SessionAuthentication, BasicAuthentication])
-#@permission_classes([IsAuthenticated])
+@authentication_classes([SessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
 def test_view(request, format=None):
     try:
         content = {
