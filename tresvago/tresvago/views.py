@@ -44,7 +44,7 @@ class PromocaoViewSet(viewsets.ModelViewSet):
 class PromocaoFilter(APIView):
     def get(self, request):
         promocoes = Promocao.objects.all()
-        data = request.data
+        data = request.GET
         if 'site' in data:
             promocoes = promocoes.filter(site=data['site'])
         if 'hotel' in data:
@@ -74,7 +74,7 @@ class CustomAuthToken(ObtainAuthToken):
         if usuario.tipo == 1:
             site = SiteReserva.objects.get(usuario=usuario)
             return Response({
-                'id': user.id,
+                'id': site.id,
                 'tipo': usuario.tipo,
                 'nome': site.nome,
                 'telefone': site.telefone,
@@ -84,7 +84,7 @@ class CustomAuthToken(ObtainAuthToken):
         if usuario.tipo == 2:
             hotel = Hotel.objects.get(usuario=usuario)
             return Response({
-                'id': user.id,
+                'id': hotel.id,
                 'tipo': usuario.tipo,
                 'nome': hotel.nome,
                 'cnpj': hotel.cnpj,
@@ -106,7 +106,7 @@ class TestAuth(APIView):
         if usuario.tipo == 1:
             site = SiteReserva.objects.get(usuario=usuario)
             return Response({
-                'id': user.id,
+                'id': site.id,
                 'tipo': usuario.tipo,
                 'nome': site.nome,
                 'telefone': site.telefone,
@@ -116,7 +116,7 @@ class TestAuth(APIView):
         if usuario.tipo == 2:
             hotel = Hotel.objects.get(usuario=usuario)
             return Response({
-                'id': user.id,
+                'id': hotel.id,
                 'tipo': usuario.tipo,
                 'nome': hotel.nome,
                 'cnpj': hotel.cnpj,
