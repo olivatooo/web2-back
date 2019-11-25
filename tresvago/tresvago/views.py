@@ -4,6 +4,8 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.utils.dateparse import parse_datetime
+
 
 from .models import *
 from .serializers import HotelSerializer, SiteReservaSerializer, PromocaoSerializer, UserSerializer
@@ -43,16 +45,18 @@ class PromocaoFilter(APIView):
     def get(self, request):
         promocoes = Promocao.objects.all()
         data = request.data
-        print("data", data)
         if 'site' in data:
             promocoes = promocoes.filter(site=data['site'])
         if 'hotel' in data:
             promocoes = promocoes.filter(hotel=data['hotel'])
         if 'cidade' in data:
             promocoes = promocoes.filter(hotel__cidade=data['cidade'])
-        if 'data_inicio' in data and 'data_fim' in data:
-            promocoes = promocoes.filter(data_inicio__gte=data['data_inicio'])
-            promocoes = promocoes.filter(data_fim__lte=data['data_fim'])
+        if 'data_inicio' in data:
+            inicio = parse_datetime(data['data_inicio'])
+            promocoes = promocoes.filter(data_inicio__gte=inicio)
+        if 'data_fim' in data:
+            fim = parse_datetime(data['data_fim'])
+            promocoes = promocoes.filter(data_fim__lte=fim)
 
         return Response(PromocaoSerializer(promocoes, many=True).data)
 
