@@ -67,10 +67,11 @@ class CustomAuthToken(ObtainAuthToken):
                 'cidade': hotel.cidade,
                 'token': token.key,
             })
-        return Response({"nome": str(user) , "tipo":0})
+
+        return Response({"nome": str(user) , "tipo":0, 'token': token.key})
 
 
-class test_auth(APIView):
+class TestAuth(APIView):
     permission_classes = (IsAuthenticated,)             # <-- And here
 
     def get(self, request):
