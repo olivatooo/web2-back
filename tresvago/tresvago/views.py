@@ -37,6 +37,10 @@ class PromocaoViewSet(viewsets.ModelViewSet):
     serializer_class = PromocaoSerializer
 
 
+class PromocaoFilter(APIView):
+    def get(self, request):
+        pass
+
 class CustomAuthToken(ObtainAuthToken):
 
     def post(self, request, *args, **kwargs):
@@ -99,4 +103,4 @@ class TestAuth(APIView):
                 'cidade': hotel.cidade,
                 'token': token.key,
             })
-        return Response({"nome": "admin", "tipo" : 0})
+        return Response({"nome": "admin", "tipo" : 0, "token" : token.key})
