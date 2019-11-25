@@ -42,6 +42,7 @@ class SiteReserva(models.Model):
             usuario = Usuario(usuario=user, tipo=1)
             usuario.save()
             self.usuario = usuario
+            self.senha = ""
             Token.objects.create(user=user)
         super().save(*args, **kwargs)
 
@@ -68,6 +69,7 @@ class Hotel(models.Model):
             usuario = Usuario(usuario=user, tipo=2)
             usuario.save()
             self.usuario = usuario
+            self.senha = ""
             Token.objects.create(user=user)
         super().save(*args, **kwargs)
 

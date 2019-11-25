@@ -26,18 +26,6 @@ class HotelViewSet(viewsets.ModelViewSet):
     queryset = Hotel.objects.defer('senha')
     serializer_class = HotelSerializer
 
-    """
-    def list(self, request, **kwargs):
-        try:
-            fields = Hotel._meta.fields
-            fields.remove('senha')
-            queryset = Hotel.objects.defer('senha').values(*fields)
-            serializer = HotelSerializer(queryset, many=True)
-            return Response(serializer.data)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
-    """
-
 
 class SiteReservaViewSet(viewsets.ModelViewSet):
     pagination_class = None
