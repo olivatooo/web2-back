@@ -13,4 +13,4 @@ Projeto criado em django-rest-framework (DRF)
 * Para ver os endpoints acesse localhost:8000
 
 
-Para usar o front criado junto com o projeto acesse: [front web 2](github.com/igmagollo/web2-front)
+Para usar o front criado junto com o projeto acesse: [front web 2](https://github.com/igmagollo/web2-front)
