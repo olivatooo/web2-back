@@ -1,5 +1,5 @@
 beautifulsoup4==4.8.1
-Django==2.2.7
+Django==2.2.10
 djangorestframework==3.10.3
 lxml==4.4.1
 mosspy==1.0.8
