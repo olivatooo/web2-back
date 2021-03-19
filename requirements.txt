@@ -1,6 +1,6 @@
 beautifulsoup4==4.8.1
 Django==2.2.13
-djangorestframework==3.10.3
+djangorestframework==3.11.2
 lxml==4.6.2
 mosspy==1.0.8
 pytz==2019.3
