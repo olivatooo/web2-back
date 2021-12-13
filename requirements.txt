@@ -1,7 +1,7 @@
 beautifulsoup4==4.8.1
 Django==2.2.21
 djangorestframework==3.11.2
-lxml==4.6.2
+lxml==4.6.5
 mosspy==1.0.8
 pytz==2019.3
 soupsieve==1.9.5
